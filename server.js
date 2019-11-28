@@ -2,6 +2,12 @@
 var express = require('express'),
     app     = express(),
     morgan  = require('morgan');
+    ObjectID = require('mongodb').ObjectID;
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
     
 Object.assign=require('object-assign')
 
@@ -10,19 +16,19 @@ app.use(morgan('combined'))
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL ,
     mongoURLLabel = "";
 
 if (mongoURL == null) {
   var mongoHost, mongoPort, mongoDatabase, mongoPassword, mongoUser;
   // If using plane old env vars via service discovery
-  if (process.env.DATABASE_SERVICE_NAME) {
-    var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase();
-    mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'];
-    mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'];
-    mongoDatabase = process.env[mongoServiceName + '_DATABASE'];
-    mongoPassword = process.env[mongoServiceName + '_PASSWORD'];
-    mongoUser = process.env[mongoServiceName + '_USER'];
+  if (process.env.DATABASE_SERVICE_NAME || true) {
+    var mongoServiceName = "";
+    mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'] || '127.0.0.1';
+    mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'] || '49447';
+    mongoDatabase = process.env[mongoServiceName + '_DATABASE'] || 'alcocheck_inndata_db';
+    mongoPassword = process.env[mongoServiceName + '_PASSWORD'] || 'alchocheck_superpassword';
+    mongoUser = process.env[mongoServiceName + '_USER'] || 'alcocheck_super';
 
   // If using env vars from secret from service binding  
   } else if (process.env.database_name) {
@@ -93,6 +99,66 @@ app.get('/', function (req, res) {
     res.render('index.html', { pageCountMessage : null});
   }
 });
+
+// app.get('/');
+
+app.post('/create-newuser' ,function (req ,res) {
+
+  // res.send('{Welcome to create new user}');
+  console.log(req.body);
+  res.send('Welcome to create user');
+
+  // db.collection('userData').createUser({
+  //   user: "test-user",
+  //   pwd: "alcouser",
+  //   roles: ["user"]
+  // });
+
+});
+
+app.post('/insert-testresults' , function(req , res) {
+  var objId =  new ObjectID(req.body.userId);
+  console.log('objId : ' , objId);
+  // console.log(req.body.userId);
+  console.log(req.body.user_current_location);
+  console.log(req.body.testValue);
+  console.log(req.body.testTakenTime);
+  var orgId =  new ObjectID(req.body.orgId);
+  console.log('orgId : ' , orgId);
+  // console.log(req.body.orgId);
+  console.log(req.body.faceMatchFailedAtResult);
+  console.log(req.body.resultStatus);
+  console.log(req.body.result_video);
+
+  var doc = {
+    "userId" : objId,
+    "user_current_location" : req.body.user_current_location,
+    "testValue" : req.body.testValue,
+    "testTakenTime" : req.body.testTakenTime,
+    "orgId" : orgId,
+    "faceMatchFailedAtResult" : req.body.faceMatchFailedAtResult,
+    "resultStatus" : req.body.resultStatus,
+    "result_video" : req.body.result_video
+
+  };
+
+ if (!db) {
+    initDb(function(err){});
+  }
+  if (db) {
+      db.collection('testResult').insertOne(doc , function(err , resp) {
+        if (err) throw err;
+        console.log("Document inserted");
+      });
+  }else {
+    res.send('unable to find database');
+  }
+
+  res.send('insert results are succes');
+});
+
+
+
 
 app.get('/pagecount', function (req, res) {
   // try to initialize the db on every request if it's not already
