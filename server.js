@@ -102,7 +102,7 @@ app.get('/', function (req, res) {
 
 // app.get('/');
 
-app.post('/create-newuser' ,function (req ,res) {
+app.get('/create-newuser' ,function (req ,res) {
 
   // res.send('{Welcome to create new user}');
   // console.log(req.body);
@@ -116,7 +116,7 @@ app.post('/create-newuser' ,function (req ,res) {
 
 });
 
-app.post('/insert-testresults' , function(req , res) {
+app.get('/insert-testresults' , function(req , res) {
   var objId =  new ObjectID(req.body.userId);
   console.log('objId : ' , objId);
   // console.log(req.body.userId);
