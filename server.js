@@ -105,7 +105,7 @@ app.get('/', function (req, res) {
 app.post('/create-newuser' ,function (req ,res) {
 
   // res.send('{Welcome to create new user}');
-  console.log(req.body);
+  // console.log(req.body);
   res.send('Welcome to create user');
 
   // db.collection('userData').createUser({
@@ -131,14 +131,14 @@ app.post('/insert-testresults' , function(req , res) {
   console.log(req.body.result_video);
 
   var doc = {
-    "userId" : objId,
-    "user_current_location" : req.body.user_current_location,
-    "testValue" : req.body.testValue,
-    "testTakenTime" : req.body.testTakenTime,
-    "orgId" : orgId,
-    "faceMatchFailedAtResult" : req.body.faceMatchFailedAtResult,
-    "resultStatus" : req.body.resultStatus,
-    "result_video" : req.body.result_video
+    "userId" : objId ||  new ObjectID(),
+    "user_current_location" : req.body.user_current_location || [0.0 , 0.0],
+    "testValue" : req.body.testValue || 0.0,
+    "testTakenTime" : req.body.testTakenTime || "01-01-2019 12:01",
+    "orgId" : orgId || new ObjectID(),
+    "faceMatchFailedAtResult" : req.body.faceMatchFailedAtResult || true,
+    "resultStatus" : req.body.resultStatus || "pass",
+    "result_video" : req.body.result_video || "testUrl"
 
   };
 

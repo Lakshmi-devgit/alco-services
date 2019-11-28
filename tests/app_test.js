@@ -28,4 +28,21 @@ describe('Basic routes tests', function() {
         })
 
     })
+
+    it('POST to /insert-testresults should return 200' , function(done){
+        chai.request(reqServer)
+        .get('/insert-testresults')
+        .end(function(err, res) {
+            res.should.have.status(200);
+            done();
+        })
+    })
+    it('POST to /create-newuser should return 200' , function(done) {
+        chai.request(reqServer)
+        .get('/create-newuser')
+        .end(function(err, res) {
+            res.should.have.status(200);
+            done();
+        })
+    })
 })
